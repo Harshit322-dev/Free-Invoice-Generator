@@ -1,6 +1,6 @@
 # 🧾 BillGen - Free Invoice Generator
 
-![BillGen Logo](https://img.shields.io/badge/BillGen-Invoice%20Generator-blue)
+![BillGen Logo]([https://img.shields.io/badge/BillGen-Invoice%20Generator-blue](https://github.com/Harshit322-dev/Free-Invoice-Generator.git))
 ![License](https://img.shields.io/badge/License-MIT-green)
 ![Version](https://img.shields.io/badge/Version-1.0.0-orange)
 
@@ -152,5 +152,5 @@ For support, email [harshitprakash0001@gmail.com] or open an issue in the reposi
 
 
 
-[![Website](https://img.shields.io/badge/Website-BillGen-blue)]([https://your-vercel-deployment-url](https://free-invoice-generator-git-main-harshit-prakashs-projects.vercel.app/home.html))
-[![GitHub](https://img.shields.io/badge/GitHub-Repository-black)](https://github.com/yourusername/billgen) 
+[![Website](https://img.shields.io/badge/Website-BillGen-blue)](https://your-vercel-deployment-url](https://free-invoice-generator-git-main-harshit-prakashs-projects.vercel.app/home.html))
+[![GitHub](https://img.shields.io/badge/GitHub-Repository-black)]([https://github.com/yourusername/billgen](https://github.com/Harshit322-dev/Free-Invoice-Generator.git)) 
