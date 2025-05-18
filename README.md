@@ -21,7 +21,7 @@ BillGen is a modern, user-friendly web application that helps individuals and bu
 
 ## 🚀 Live Demo
 
-Visit our live website: [BillGen](https://your-vercel-deployment-url)
+Visit our live website: [BillGen]([https://your-vercel-deployment-url](https://free-invoice-generator-git-main-harshit-prakashs-projects.vercel.app/home.html))
 
 ## 🛠️ Technologies Used
 
@@ -152,5 +152,5 @@ For support, email [harshitprakash0001@gmail.com] or open an issue in the reposi
 
 
 
-[![Website](https://img.shields.io/badge/Website-BillGen-blue)](https://your-vercel-deployment-url)
+[![Website](https://img.shields.io/badge/Website-BillGen-blue)]([https://your-vercel-deployment-url](https://free-invoice-generator-git-main-harshit-prakashs-projects.vercel.app/home.html))
 [![GitHub](https://img.shields.io/badge/GitHub-Repository-black)](https://github.com/yourusername/billgen) 
