@@ -1,0 +1,1661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice Generator</title>
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        :root {
+    --primary-color: #2563eb;
+    --secondary-color: #3b82f6;
+    --accent-color: #1d4ed8;
+    --background-color: #050644;
+    --text-color: #1e293b;
+    --border-color: #e2e8f0;
+    --success-color: #22c55e;
+    --error-color: #ef4444;
+    --input-bg: #ffffff;
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    
+}
+
+body {
+    font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+    line-height: 1.6;
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+header {
+    text-align: center;
+    margin-top: 2.5rem;
+    margin-bottom: 3rem;
+}
+
+header h1 {
+    color: var(--primary-color);
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    font-weight: 700;
+}
+
+.invoice-form {
+    background: white;
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: var(--shadow-lg);
+}
+
+section {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    background: var(--input-bg);
+    transition: all 0.3s ease;
+}
+
+section:hover {
+    box-shadow: var(--shadow);
+}
+
+h2 {
+    color: var(--primary-color);
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+h2::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 1.5rem;
+    background-color: var(--primary-color);
+    border-radius: 2px;
+}
+
+.form-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.input-wrapper {
+    position: relative;
+}
+
+.input-wrapper label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+input, textarea, select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background-color: var(--input-bg);
+}
+
+input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+input.error, textarea.error, select.error {
+    border-color: var(--error-color);
+}
+
+.error-message {
+    color: var(--error-color);
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    display: none;
+}
+
+input.error + .error-message,
+textarea.error + .error-message,
+select.error + .error-message {
+    display: block;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.logo-upload {
+    margin-bottom: 1.5rem;
+    padding: 1.5rem;
+    border: 2px dashed var(--border-color);
+    border-radius: 0.75rem;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.logo-upload:hover {
+    border-color: var(--primary-color);
+    background-color: rgba(37, 99, 235, 0.05);
+}
+
+.logo-upload label {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.logo-upload label:hover {
+    background-color: var(--accent-color);
+}
+
+.logo-upload input[type="file"] {
+    display: none;
+}
+
+#logo-preview {
+    max-width: 25%;
+    max-height: 10%;
+    margin: 1rem auto;
+}
+
+#logo-preview img {
+    max-width: 25%;
+    max-height: 10%;
+    border-radius: 0.5rem;
+}
+
+.item-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr auto;
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background-color: var(--input-bg);
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.item-row:hover {
+    box-shadow: var(--shadow);
+}
+
+.item-total {
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.btn-primary, .btn-secondary {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.btn-secondary {
+    background-color: #64748b;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: var(--accent-color);
+    transform: translateY(-1px);
+}
+
+.btn-secondary:hover {
+    background-color: #475569;
+    transform: translateY(-1px);
+}
+
+.btn-primary:disabled, .btn-secondary:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.totals {
+    background-color: var(--input-bg);
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    box-shadow: var(--shadow);
+}
+
+.total-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+    font-size: 1.1rem;
+    padding: 0.5rem 0;
+}
+
+.grand-total {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    border-top: 2px solid var(--border-color);
+    padding-top: 1rem;
+    margin-top: 0.5rem;
+}
+
+.signature-pad {
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    margin-bottom: 1rem;
+    overflow: hidden;
+}
+
+#signature-pad {
+    width: 100%;
+    height: 200px;
+    background-color: white;
+}
+
+.actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 2rem;
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+}
+
+.modal-content {
+    background-color: white;
+    margin: 5% auto;
+    padding: 2rem;
+    width: 90%;
+    max-width: 1000px;
+    border-radius: 1rem;
+    position: relative;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow-lg);
+}
+
+.close {
+    position: absolute;
+    right: 1.5rem;
+    top: 1.5rem;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--text-color);
+    transition: all 0.3s ease;
+}
+
+.close:hover {
+    color: var(--error-color);
+    transform: scale(1.1);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+    }
+
+    .invoice-form {
+        padding: 1rem;
+    }
+
+    .item-row {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+
+    .actions {
+        flex-direction: column;
+    }
+
+    .btn-primary, .btn-secondary {
+        width: 100%;
+    }
+}
+
+/* Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+section {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Loading Spinner */
+.spinner {
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Invoice Preview Styles */
+.invoice-preview {
+    padding: 2rem;
+    background: white;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.invoice-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.company-info {
+    flex: 2;
+}
+
+.invoice-details {
+    flex: 1;
+    text-align: left;
+}
+
+.invoice-details h3 {
+    color: var(--primary-color);
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.bill-from, .bill-to {
+    margin-bottom: 2rem;
+}
+
+.bill-from h3, .bill-to h3 {
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.items-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 2rem 0;
+}
+
+.items-table th, .items-table td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.items-table th {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.items-table tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+.signature-section {
+    margin-top: 3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.signature {
+    width: 300px;
+    border-top: 1px solid var(--border-color);
+    padding-top: 0.5rem;
+}
+
+.signature img {
+    max-width: 100%;
+    height: auto;
+}
+
+.signature-date {
+    text-align: left;
+}
+
+/* Preview Actions */
+.preview-actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+}
+
+#print-invoice {
+    padding: 0.75rem 1.5rem;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+#print-invoice:hover {
+    background-color: var(--accent-color);
+    transform: translateY(-1px);
+}
+
+/* Print Styles */
+@media print {
+    @page {
+        size: A4;
+        margin: 10mm;
+    }
+
+    body * {
+        visibility: hidden;
+    }
+    
+    .modal {
+        position: fixed;
+        left: 0;
+        top: 0;
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        background: white;
+        z-index: 9999;
+    }
+
+    .modal-content {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        box-shadow: none;
+        border: none;
+        overflow: visible;
+    }
+    
+    .invoice-preview, .invoice-preview * {
+        visibility: visible;
+    }
+    
+    .invoice-preview {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        padding: 0;
+        margin: 0;
+        background: white;
+        font-size: 8pt;
+        transform: none;
+    }
+
+    /* Company Info and Invoice Details Layout */
+    .invoice-header {
+        display: block;
+        margin-bottom: 0.5rem;
+        padding-bottom: 0.25rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .company-info, .invoice-details {
+        display: inline-block;
+        width: 48%;
+        margin-bottom: 0.5rem;
+        font-size: 8pt;
+        vertical-align: top;
+    }
+
+    .company-info {
+        margin-right: 2%;
+    }
+
+    .company-info img {
+        max-width: 50px;
+        height: auto;
+        margin-bottom: 0.25rem;
+    }
+
+    .company-info h2 {
+        font-size: 12pt;
+        margin-bottom: 0.25rem;
+    }
+
+    .company-info p {
+        margin: 0.1rem 0;
+        line-height: 1.2;
+    }
+
+    .invoice-details {
+        text-align: right;
+    }
+
+    .invoice-details h3 {
+        font-size: 14pt;
+        margin-bottom: 0.25rem;
+    }
+
+    .invoice-details p {
+        margin: 0.1rem 0;
+        line-height: 1.2;
+    }
+
+    /* Bill From and Bill To Layout */
+    .bill-from, .bill-to {
+        display: inline-block;
+        width: 48%;
+        margin-bottom: 0.5rem;
+        font-size: 8pt;
+        vertical-align: top;
+    }
+
+    .bill-from {
+        margin-right: 2%;
+    }
+
+    .bill-from h3, .bill-to h3 {
+        font-size: 10pt;
+        margin-bottom: 0.25rem;
+    }
+
+    .bill-from p, .bill-to p {
+        margin: 0.1rem 0;
+        line-height: 1.2;
+    }
+
+    /* Items Table Layout */
+    .items-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0.5rem 0;
+        font-size: 8pt;
+        table-layout: fixed;
+    }
+
+    .items-table th {
+        background-color: var(--primary-color) !important;
+        color: white !important;
+        padding: 0.15rem;
+        border: 1px solid var(--border-color);
+        white-space: nowrap;
+    }
+
+    .items-table td {
+        padding: 0.15rem;
+        border: 1px solid var(--border-color);
+        word-wrap: break-word;
+    }
+
+    /* Column widths for better alignment */
+    .items-table th:nth-child(1),
+    .items-table td:nth-child(1) {
+        width: 35%; /* Description */
+    }
+
+    .items-table th:nth-child(2),
+    .items-table td:nth-child(2) {
+        width: 15%; /* Unit Price */
+    }
+
+    .items-table th:nth-child(3),
+    .items-table td:nth-child(3) {
+        width: 10%; /* Quantity */
+    }
+
+    .items-table th:nth-child(4),
+    .items-table td:nth-child(4) {
+        width: 10%; /* Discount */
+    }
+
+    .items-table th:nth-child(5),
+    .items-table td:nth-child(5) {
+        width: 10%; /* Tax */
+    }
+
+    .items-table th:nth-child(6),
+    .items-table td:nth-child(6) {
+        width: 20%; /* Total */
+    }
+
+    /* Totals Section */
+    .totals {
+        margin-top: 0.5rem;
+        font-size: 8pt;
+        width: 50%;
+        margin-left: auto;
+    }
+
+    .total-row {
+        padding: 0.15rem 0;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .grand-total {
+        font-size: 10pt;
+        font-weight: bold;
+        border-top: 1px solid var(--border-color);
+        margin-top: 0.25rem;
+        padding-top: 0.25rem;
+    }
+
+    /* Signature Section */
+    .signature-section {
+        margin-top: 0.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+    }
+
+    .signature {
+        width: 100px;
+    }
+
+    .signature img {
+        max-width: 100px;
+        height: auto;
+    }
+
+    .signature-date {
+        text-align: right;
+        font-size: 8pt;
+    }
+
+    .preview-actions, .close {
+        display: none !important;
+    }
+
+    /* Ensure all colors and styles are preserved */
+    * {
+        -webkit-print-color-adjust: exact !important;
+        color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+}
+
+/* Additional Responsive Styles */
+@media (max-width: 768px) {
+    .invoice-header {
+        flex-direction: column;
+    }
+    
+    .invoice-details {
+        text-align: left;
+        margin-top: 1rem;
+    }
+    
+    .items-table {
+        display: block;
+        overflow-x: auto;
+    }
+    
+    .signature-section {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .signature-date {
+        margin-top: 1rem;
+        text-align: left;
+    }
+}
+
+/* PDF Export Styles */
+@media print {
+    .invoice-preview {
+        padding: 20mm;
+        width: 210mm; /* A4 width */
+        min-height: 297mm; /* A4 height */
+        margin: 0;
+        background: white;
+    }
+
+    .invoice-preview * {
+        -webkit-print-color-adjust: exact !important;
+        color-adjust: exact !important;
+    }
+
+    .items-table {
+        page-break-inside: avoid;
+    }
+
+    .signature-section {
+        page-break-inside: avoid;
+    }
+
+    .totals {
+        page-break-inside: avoid;
+    }
+}
+
+/* Ensure images are properly rendered in PDF */
+.invoice-preview img {
+    max-width: 15%;
+    height: auto;
+    display: block;
+}
+
+/* Improve table layout for PDF */
+.items-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 2rem 0;
+    table-layout: fixed;
+}
+
+.items-table th,
+.items-table td {
+    padding: 0.75rem;
+    text-align: left;
+    border: 1px solid var(--border-color);
+    word-wrap: break-word;
+}
+
+.items-table th {
+    background-color: var(--primary-color) !important;
+    color: white !important;
+} 
+        /* Navigation Bar Styles */
+        .navbar {
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 0.6rem 2%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            height: 4rem;
+            width: 96%;
+            top: 1rem;
+            left: 2%;
+            z-index: 1000;
+            border-radius: 1rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.3rem 0.8rem;
+            background: linear-gradient(45deg, rgba(31, 30, 30, 0.1), rgba(81, 145, 230, 0.1));
+            border-radius: 0.8rem;
+            transition: transform 0.3s ease;
+        }
+
+        .logo-container:hover {
+            transform: translateY(-2px);
+        }
+
+        .logo-container i {
+            font-size: 1.8rem;
+            background: linear-gradient(45deg, #1f1e1e, #5191e6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+        }
+
+        .logo-text {
+            font-size: 1.4rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #1f1e1e, #5191e6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            padding: 0.3rem 0.8rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 0.8rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #4b5563;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 0.4rem 0.8rem;
+            border-radius: 0.6rem;
+            font-size: 0.95rem;
+        }
+
+        .nav-links a:hover {
+            color: #5191e6;
+            background: rgba(81, 145, 230, 0.1);
+        }
+
+        .nav-links .generate-btn {
+            background: linear-gradient(to right, #1f1e1e, #5191e6);
+            color: white;
+            padding: 0.5rem 1.2rem;
+            border-radius: 0.8rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(81, 145, 230, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.95rem;
+        }
+
+        .nav-links .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(81, 145, 230, 0.3);
+            background: linear-gradient(to right, #5191e6, #1f1e1e);
+        }
+
+        /* Footer Styles */
+        .footer {
+            background-color: #050644;
+            color: white;
+            padding: 4rem 2rem 2rem;
+            margin-top: 4rem;
+        }
+
+        .footer-container {
+            max-width: 1300px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 3rem;
+        }
+
+        .footer-column h3 {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            color: #d5eecb;
+        }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-links a {
+            color: #a0aec0;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: #d5eecb;
+        }
+
+        .footer-bottom {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            color: #a0aec0;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .social-links a {
+            color: #a0aec0;
+            font-size: 1.5rem;
+            transition: color 0.3s ease;
+        }
+
+        .social-links a:hover {
+            color: #d5eecb;
+        }
+
+        /* Adjust main content for navbar */
+        .container {
+            margin-top: 6rem;
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                height: 3.5rem;
+                padding: 0.4rem;
+            }
+
+            .nav-links {
+                gap: 0.8rem;
+                padding: 0.2rem 0.6rem;
+            }
+
+            .nav-links a {
+                padding: 0.3rem 0.6rem;
+                font-size: 0.85rem;
+            }
+
+            .nav-links .generate-btn {
+                padding: 0.4rem 1rem;
+                font-size: 0.85rem;
+            }
+
+            .logo-text {
+                font-size: 1.2rem;
+            }
+
+            .logo-container i {
+                font-size: 1.6rem;
+            }
+
+            .footer-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .footer-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="logo-container">
+            <i class="fas fa-file-invoice-dollar"></i>
+            <span class="logo-text">BillGen</span>
+        </div>
+        <div class="nav-links">
+            <a href="#">For Individual</a>
+            <a href="#">For Professional</a>
+            <a href="#">Pricing</a>
+            <a href="home.html" class="generate-btn">Home</a>
+            <a href="#">Login</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-file-invoice-dollar"></i> Invoice Generator</h1>
+        </header>
+
+        <main>
+            <div class="invoice-form">
+                <!-- Company Information -->
+                <section class="company-info">
+                    <h2><i class="fas fa-building"></i> Company Information</h2>
+                    <div class="logo-upload">
+                        <label for="company-logo">
+                            <i class="fas fa-cloud-upload-alt"></i> Upload Company Logo
+                        </label>
+                        <input type="file" id="company-logo" accept="image/*">
+                        <div id="logo-preview"></div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-wrapper">
+                            <label for="company-name"><i class="fas fa-building"></i> Company Name</label>
+                            <input type="text" id="company-name" placeholder="Enter company name" required
+                                   pattern="[A-Za-z0-9\s\-&.,]+" minlength="2" maxlength="100">
+                            <span class="error-message"><i class="fas fa-exclamation-circle"></i> Please enter a valid company name</span>
+                        </div>
+                        <div class="input-wrapper">
+                            <label for="company-address"><i class="fas fa-map-marker-alt"></i> Company Address</label>
+                            <textarea id="company-address" placeholder="Enter company address" required
+                                      minlength="10" maxlength="200"></textarea>
+                            <span class="error-message"><i class="fas fa-exclamation-circle"></i> Please enter a valid address</span>
+                        </div>
+                        <div class="input-wrapper">
+                            <label for="company-phone"><i class="fas fa-phone"></i> Telephone Number</label>
+                            <input type="tel" id="company-phone" placeholder="Enter phone number" required
+                                   pattern="[0-9+\-\s()]{10,15}">
+                            <span class="error-message"><i class="fas fa-exclamation-circle"></i> Please enter a valid phone number</span>
+                        </div>
+                        <div class="input-wrapper">
+                            <label for="company-email"><i class="fas fa-envelope"></i> Email Address</label>
+                            <input type="email" id="company-email" placeholder="Enter email address" required>
+                            <span class="error-message"><i class="fas fa-exclamation-circle"></i> Please enter a valid email address</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Invoice Details -->
+                <section class="invoice-details">
+                    <h2><i class="fas fa-file-alt"></i> Invoice Details</h2>
+                    <div class="form-group">
+                        <div class="input-wrapper">
+                            <label for="invoice-number"><i class="fas fa-hashtag"></i> Invoice Number</label>
+                            <input type="text" id="invoice-number" placeholder="Enter invoice number" required
+                                   pattern="[A-Za-z0-9\-]+" minlength="3" maxlength="20">
+                            <span class="error-message"><i class="fas fa-exclamation-circle"></i> Please enter a valid invoice number</span>
+                        </div>
+                        <div class="input-wrapper">
+                            <label for="invoice-date"><i class="fas fa-calendar-alt"></i> Invoice Date</label>
+                            <input type="date" id="invoice-date" required>
+                            <span class="error-message"><i class="fas fa-exclamation-circle"></i> Please select a valid date</span>
+                        </div>
+                        <div class="input-wrapper">
+                            <label for="due-date"><i class="fas fa-clock"></i> Due Date</label>
+                            <input type="date" id="due-date" required>
+                            <span class="error-message"><i class="fas fa-exclamation-circle"></i> Please select a valid due date</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Bill From -->
+                <section class="bill-from">
+                    <h2><i class="fas fa-user-tie"></i> Bill From</h2>
+                    <div class="form-group">
+                        <div class="input-wrapper">
+                            <label for="from-name"><i class="fas fa-user"></i> Name</label>
+                            <input type="text" id="from-name" placeholder="Enter name" required
+                                   pattern="[A-Za-z\s]+" minlength="2" maxlength="100">
+                            <span class="error-message"><i class="fas fa-exclamation-circle"></i> Please enter a valid name</span>
+                        </div>
+                        <div class="input-wrapper">
+                            <label for="from-address"><i class="fas fa-map-marker-alt"></i> Address</label>
+                            <textarea id="from-address" placeholder="Enter address" required
+                                      minlength="10" maxlength="200"></textarea>
+                            <span class="error-message"><i class="fas fa-exclamation-circle"></i> Please enter a valid address</span>
+                        </div>
+                        <div class="input-wrapper">
+                            <label for="from-pincode"><i class="fas fa-map-pin"></i> Pincode</label>
+                            <input type="text" id="from-pincode" placeholder="Enter pincode" required
+                                   pattern="[0-9]{6}" maxlength="6">
+                            <span class="error-message"><i class="fas fa-exclamation-circle"></i> Please enter a valid 6-digit pincode</span>
+                        </div>
+                        <div class="input-wrapper">
+                            <label for="from-state"><i class="fas fa-map"></i> State</label>
+                            <input type="text" id="from-state" placeholder="Enter state" required
+                                   pattern="[A-Za-z\s]+" minlength="2" maxlength="50">
+                            <span class="error-message"><i class="fas fa-exclamation-circle"></i> Please enter a valid state</span>
+                        </div>
+                        <div class="input-wrapper">
+                            <label for="from-country"><i class="fas fa-globe"></i> Country</label>
+                            <input type="text" id="from-country" placeholder="Enter country" required
+                                   pattern="[A-Za-z\s]+" minlength="2" maxlength="50">
+                            <span class="error-message"><i class="fas fa-exclamation-circle"></i> Please enter a valid country</span>
+                        </div>
+                        <div class="input-wrapper">
+                            <label for="from-phone"><i class="fas fa-phone"></i> Phone Number</label>
+                            <input type="tel" id="from-phone" placeholder="Enter phone number" required
+                                   pattern="[0-9+\-\s()]{10,15}">
+                            <span class="error-message"><i class="fas fa-exclamation-circle"></i> Please enter a valid phone number</span>
+                        </div>
+                        <div class="input-wrapper">
+                            <label for="from-email"><i class="fas fa-envelope"></i> Email Address</label>
+                            <input type="email" id="from-email" placeholder="Enter email address" required>
+                            <span class="error-message"><i class="fas fa-exclamation-circle"></i> Please enter a valid email address</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Bill To -->
+                <section class="bill-to">
+                    <h2><i class="fas fa-user"></i> Bill To</h2>
+                    <div class="form-group">
+                        <div class="input-wrapper">
+                            <label for="to-name"><i class="fas fa-user"></i> Name</label>
+                            <input type="text" id="to-name" placeholder="Enter name" required
+                                   pattern="[A-Za-z\s]+" minlength="2" maxlength="100">
+                            <span class="error-message"><i class="fas fa-exclamation-circle"></i> Please enter a valid name</span>
+                        </div>
+                        <div class="input-wrapper">
+                            <label for="to-address"><i class="fas fa-map-marker-alt"></i> Address</label>
+                            <textarea id="to-address" placeholder="Enter address" required
+                                      minlength="10" maxlength="200"></textarea>
+                            <span class="error-message"><i class="fas fa-exclamation-circle"></i> Please enter a valid address</span>
+                        </div>
+                        <div class="input-wrapper">
+                            <label for="to-pincode"><i class="fas fa-map-pin"></i> Pincode</label>
+                            <input type="text" id="to-pincode" placeholder="Enter pincode" required
+                                   pattern="[0-9]{6}" maxlength="6">
+                            <span class="error-message"><i class="fas fa-exclamation-circle"></i> Please enter a valid 6-digit pincode</span>
+                        </div>
+                        <div class="input-wrapper">
+                            <label for="to-state"><i class="fas fa-map"></i> State</label>
+                            <input type="text" id="to-state" placeholder="Enter state" required
+                                   pattern="[A-Za-z\s]+" minlength="2" maxlength="50">
+                            <span class="error-message"><i class="fas fa-exclamation-circle"></i> Please enter a valid state</span>
+                        </div>
+                        <div class="input-wrapper">
+                            <label for="to-country"><i class="fas fa-globe"></i> Country</label>
+                            <input type="text" id="to-country" placeholder="Enter country" required
+                                   pattern="[A-Za-z\s]+" minlength="2" maxlength="50">
+                            <span class="error-message"><i class="fas fa-exclamation-circle"></i> Please enter a valid country</span>
+                        </div>
+                        <div class="input-wrapper">
+                            <label for="to-phone"><i class="fas fa-phone"></i> Phone Number</label>
+                            <input type="tel" id="to-phone" placeholder="Enter phone number" required
+                                   pattern="[0-9+\-\s()]{10,15}">
+                            <span class="error-message"><i class="fas fa-exclamation-circle"></i> Please enter a valid phone number</span>
+                        </div>
+                        <div class="input-wrapper">
+                            <label for="to-email"><i class="fas fa-envelope"></i> Email Address</label>
+                            <input type="email" id="to-email" placeholder="Enter email address" required>
+                            <span class="error-message"><i class="fas fa-exclamation-circle"></i> Please enter a valid email address</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Items -->
+                <section class="items">
+                    <h2><i class="fas fa-shopping-cart"></i> Items</h2>
+                    <div id="items-container">
+                        <div class="item-row">
+                            <div class="input-wrapper">
+                                <label><i class="fas fa-tag"></i> Description</label>
+                                <input type="text" placeholder="Enter item description" class="item-description" required>
+                            </div>
+                            <div class="input-wrapper">
+                                <label><i class="fas fa-dollar-sign"></i> Unit Price</label>
+                                <input type="number" placeholder="Enter unit price" class="item-price" required min="0" step="0.01">
+                            </div>
+                            <div class="input-wrapper">
+                                <label><i class="fas fa-sort-numeric-up"></i> Quantity</label>
+                                <input type="number" placeholder="Enter quantity" class="item-quantity" required min="1">
+                            </div>
+                            <div class="input-wrapper">
+                                <label><i class="fas fa-percent"></i> Discount</label>
+                                <input type="number" placeholder="Enter discount %" class="item-discount" min="0" max="100">
+                            </div>
+                            <div class="input-wrapper">
+                                <label><i class="fas fa-calculator"></i> Tax</label>
+                                <select class="item-tax" required>
+                                    <option value="0">No Tax</option>
+                                    <option value="5">5%</option>
+                                    <option value="10">10%</option>
+                                    <option value="15">15%</option>
+                                    <option value="20">20%</option>
+                                </select>
+                            </div>
+                            <span class="item-total" style="align-items: center;"> 0.00</span>
+                            <button class="remove-item" style="display: none;"><i class="fas fa-trash-alt"></i></button>
+                        </div>
+                    </div>
+                    <button id="add-item" class="btn-secondary"><i class="fas fa-plus-circle"></i> Add Item</button>
+                </section>
+
+                <!-- Totals -->
+                <section class="totals">
+                    <div class="total-row">
+                        <span><i class="fas fa-calculator"></i> Subtotal:</span>
+                        <span id="subtotal">0.00</span>
+                    </div>
+                    <div class="total-row">
+                        <span><i class="fas fa-tags"></i> Total Discount:</span>
+                        <span id="total-discount">0.00</span>
+                    </div>
+                    <div class="total-row">
+                        <span><i class="fas fa-percentage"></i> Tax:</span>
+                        <span id="tax-total">0.00</span>
+                    </div>
+                    <div class="total-row grand-total">
+                        <span><i class="fas fa-money-bill-wave"></i> Total:</span>
+                        <span id="grand-total">0.00</span>
+                    </div>
+                </section>
+
+                <!-- Signature -->
+                <section class="signature">
+                    <h2><i class="fas fa-signature"></i> Signature</h2>
+                    <div class="signature-pad">
+                        <canvas id="signature-pad"></canvas>
+                        <button id="clear-signature" class="btn-secondary"><i class="fas fa-eraser"></i> Clear Signature</button>
+                    </div>
+                    <div class="signature-date">
+                        <div class="input-wrapper">
+                            <label for="signature-date"><i class="fas fa-calendar-check"></i> Date and Time</label>
+                            <input type="datetime-local" id="signature-date" required>
+                            <span class="error-message"><i class="fas fa-exclamation-circle"></i> Please select a valid date and time</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Actions -->
+                <section class="actions">
+                    <button id="preview-invoice" class="btn-primary"><i class="fas fa-eye"></i> Preview Invoice</button>
+                    
+                </section>
+            </div>
+
+            <!-- Preview Modal -->
+            <div id="preview-modal" class="modal">
+                <div class="modal-content">
+                    <span class="close"><i class="fas fa-times"></i></span>
+                    <div id="invoice-preview"></div>
+                    <div class="preview-actions">
+                        <button id="print-invoice" class="btn-primary"><i class="fas fa-print"></i> Print Invoice</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
+    <script src="script.js"></script>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-column">
+                <h3>BillGen</h3>
+                <p style="color: #a0aec0;">Create professional invoices in minutes. No sign-up required.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+            <div class="footer-column">
+                <h3>Quick Links</h3>
+                <ul class="footer-links">
+                    <li><a href="home.html">Home</a></li>
+                    <li><a href="#">Features</a></li>
+                    <li><a href="#">Pricing</a></li>
+                    <li><a href="#">Blog</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>Support</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Help Center</a></li>
+                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="#">FAQs</a></li>
+                    <li><a href="#">Documentation</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>Legal</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                    <li><a href="#">Cookie Policy</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 BillGen. All rights reserved.</p>
+        </div>
+    </footer>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+    // Initialize signature pad
+    const canvas = document.getElementById('signature-pad');
+    const signaturePad = new SignaturePad(canvas, {
+        backgroundColor: 'rgb(255, 255, 255)'
+    });
+
+    // Handle logo upload
+    const logoInput = document.getElementById('company-logo');
+    const logoPreview = document.getElementById('logo-preview');
+    
+    logoInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                logoPreview.innerHTML = '';
+                logoPreview.appendChild(img);
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Handle items
+    const itemsContainer = document.getElementById('items-container');
+    const addItemBtn = document.getElementById('add-item');
+
+    function calculateItemTotal(row) {
+        const price = parseFloat(row.querySelector('.item-price').value) || 0;
+        const quantity = parseFloat(row.querySelector('.item-quantity').value) || 0;
+        const discount = parseFloat(row.querySelector('.item-discount').value) || 0;
+        const tax = parseFloat(row.querySelector('.item-tax').value) || 0;
+
+        
+        const subtotal = price * quantity;
+        const discountAmount = (subtotal * discount) / 100;
+        const afterDiscount = subtotal - discountAmount;
+        const taxAmount = (afterDiscount * tax) / 100;
+        const total = afterDiscount + taxAmount;
+
+        row.querySelector('.item-total').textContent = total.toFixed(2);
+        calculateTotals();
+    }
+
+    function calculateTotals() {
+        let subtotal = 0;
+        let totalDiscount = 0;
+        let totalTax = 0;
+
+        document.querySelectorAll('.item-row').forEach(row => {
+            const price = parseFloat(row.querySelector('.item-price').value) || 0;
+            const quantity = parseInt(row.querySelector('.item-quantity').value) || 0;
+            const discount = parseFloat(row.querySelector('.item-discount').value) || 0;
+            const tax = parseFloat(row.querySelector('.item-tax').value) || 0;
+
+            const itemTotal = price * quantity;
+            const discountAmount = (itemTotal * discount) / 100;
+            const afterDiscount = itemTotal - discountAmount;
+            const taxAmount = (afterDiscount * tax) / 100;
+
+            totalDiscount += discountAmount;
+            subtotal += afterDiscount;
+            totalTax += taxAmount;
+
+            row.querySelector('.item-total').textContent = afterDiscount.toFixed(2);
+        });
+
+        document.getElementById('subtotal').textContent = subtotal.toFixed(2);
+        document.getElementById('total-discount').textContent = totalDiscount.toFixed(2);
+        document.getElementById('tax-total').textContent = totalTax.toFixed(2);
+        document.getElementById('grand-total').textContent = (subtotal + totalTax).toFixed(2);
+    }
+
+    function addItemRow() {
+        const row = document.createElement('div');
+        row.className = 'item-row';
+        row.innerHTML = `
+            <input type="text" placeholder="Description" class="item-description">
+            <input type="number" placeholder="Unit Price" class="item-price">
+            <input type="number" placeholder="Quantity" class="item-quantity">
+            <input type="number" placeholder="Discount %" class="item-discount">
+            <select class="item-tax">
+                <option value="0">No Tax</option>
+                <option value="5">5%</option>
+                <option value="10">10%</option>
+                <option value="15">15%</option>
+                <option value="20">20%</option>
+            </select>
+            <span class="item-total">0.00</span>
+            <button class="remove-item"><i class="fas fa-trash"></i></button>
+        `;
+
+        // Add event listeners for calculations
+        const inputs = row.querySelectorAll('input, select');
+        inputs.forEach(input => {
+            input.addEventListener('input', () => calculateItemTotal(row));
+        });
+
+        // Add remove button functionality
+        const removeBtn = row.querySelector('.remove-item');
+        removeBtn.addEventListener('click', () => {
+            row.remove();
+            calculateTotals();
+        });
+
+        itemsContainer.appendChild(row);
+    }
+
+    addItemBtn.addEventListener('click', addItemRow);
+
+    // Preview functionality
+    const previewBtn = document.getElementById('preview-invoice');
+    const modal = document.getElementById('preview-modal');
+    const closeBtn = document.querySelector('.close');
+    const previewContent = document.getElementById('invoice-preview');
+    const printBtn = document.getElementById('print-invoice');
+
+    function generatePreview() {
+        const preview = document.createElement('div');
+        preview.className = 'invoice-preview';
+        preview.innerHTML = `
+            <div class="invoice-header">
+                <div class="company-info">
+                    ${logoPreview.innerHTML}
+                    <h2>${document.getElementById('company-name').value}</h2>
+                    <p>${document.getElementById('company-address').value}</p>
+                    <p>Phone: ${document.getElementById('company-phone').value}</p>
+                    <p>Email: ${document.getElementById('company-email').value}</p>
+                </div>
+                <div class="invoice-details">
+                    <h3>INVOICE</h3>
+                    <p>Invoice #: ${document.getElementById('invoice-number').value}</p>
+                    <p>Date: ${document.getElementById('invoice-date').value}</p>
+                    <p>Due Date: ${document.getElementById('due-date').value}</p>
+                </div>
+            </div>
+            <div class="bill-from">
+                <h3>Bill From</h3>
+                <p>${document.getElementById('from-name').value}</p>
+                <p>${document.getElementById('from-address').value}</p>
+                <p>${document.getElementById('from-pincode').value}, ${document.getElementById('from-state').value}</p>
+                <p>${document.getElementById('from-country').value}</p>
+                <p>Phone: ${document.getElementById('from-phone').value}</p>
+                <p>Email: ${document.getElementById('from-email').value}</p>
+            </div>
+            <div class="bill-to">
+                <h3>Bill To</h3>
+                <p>${document.getElementById('to-name').value}</p>
+                <p>${document.getElementById('to-address').value}</p>
+                <p>${document.getElementById('to-pincode').value}, ${document.getElementById('to-state').value}</p>
+                <p>${document.getElementById('to-country').value}</p>
+                <p>Phone: ${document.getElementById('to-phone').value}</p>
+                <p>Email: ${document.getElementById('to-email').value}</p>
+            </div>
+            <table class="items-table">
+                <thead>
+                    <tr>
+                        <th>Description</th>
+                        <th>Unit Price</th>
+                        <th>Quantity</th>
+                        <th>Discount</th>
+                        <th>Tax</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${Array.from(document.querySelectorAll('.item-row')).map(row => `
+                        <tr>
+                            <td>${row.querySelector('.item-description').value}</td>
+                            <td>${row.querySelector('.item-price').value}</td>
+                            <td>${row.querySelector('.item-quantity').value}</td>
+                            <td>${row.querySelector('.item-discount').value}%</td>
+                            <td>${row.querySelector('.item-tax').value}%</td>
+                            <td>${row.querySelector('.item-total').textContent}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+            <div class="totals">
+                <div class="total-row">
+                    <span>Subtotal:</span>
+                    <span>${document.getElementById('subtotal').textContent}</span>
+                </div>
+                <div class="total-row">
+                    <span>Discount:</span>
+                    <span>${document.getElementById('total-discount').textContent}</span>
+                </div>
+                <div class="total-row">
+                    <span>Tax:</span>
+                    <span>${document.getElementById('tax-total').textContent}</span>
+                </div>
+                <div class="total-row grand-total">
+                    <span>Total:</span>
+                    <span>${document.getElementById('grand-total').textContent}</span>
+                </div>
+            </div>
+            <div class="signature-section">
+                <div class="signature">
+                    <img src="${signaturePad.toDataURL()}" alt="Signature" style="max-width: 100%; height: auto; width: 300px;">
+                </div>
+                <div class="signature-date">
+                    <p>Date: ${document.getElementById('signature-date').value}</p>
+                </div>
+            </div>
+            <div class="thank-you-message" style="text-align: center; margin-top: 2rem; font-size: 1.2rem; font-weight: bold; color: var(--primary-color);">
+                Thank you for shopping with us!
+            </div>
+        `;
+        return preview;
+    }
+
+    previewBtn.addEventListener('click', () => {
+        previewContent.innerHTML = '';
+        previewContent.appendChild(generatePreview());
+        modal.style.display = 'block';
+    });
+
+    closeBtn.addEventListener('click', () => {
+        modal.style.display = 'none';
+    });
+
+    // Print functionality
+    printBtn.addEventListener('click', () => {
+        // Create a clone of the preview content
+        const printContent = previewContent.cloneNode(true);
+        
+        // Create a temporary container for printing
+        const printContainer = document.createElement('div');
+        printContainer.style.position = 'fixed';
+        printContainer.style.left = '0';
+        printContainer.style.top = '0';
+        printContainer.style.width = '100%';
+        printContainer.style.height = '100%';
+        printContainer.style.background = 'white';
+        printContainer.style.zIndex = '9999';
+        printContainer.appendChild(printContent);
+        document.body.appendChild(printContainer);
+
+        // Wait for images to load
+        const images = printContainer.getElementsByTagName('img');
+        let loadedImages = 0;
+        const totalImages = images.length;
+
+        function tryPrint() {
+            if (loadedImages === totalImages) {
+                // All images loaded, proceed with printing
+                setTimeout(() => {
+                    window.print();
+                    // Clean up after printing
+                    setTimeout(() => {
+                        document.body.removeChild(printContainer);
+                    }, 1000);
+                }, 500);
+            }
+        }
+
+        // Handle image loading
+        Array.from(images).forEach(img => {
+            if (img.complete) {
+                loadedImages++;
+                tryPrint();
+            } else {
+                img.onload = () => {
+                    loadedImages++;
+                    tryPrint();
+                };
+                img.onerror = () => {
+                    loadedImages++;
+                    tryPrint();
+                };
+            }
+        });
+
+        // If no images, print immediately
+        if (totalImages === 0) {
+            tryPrint();
+        }
+    });
+
+    // Handle print after dialog closes
+    window.addEventListener('afterprint', () => {
+        modal.style.display = 'none';
+    });
+
+  
+
+    // Clear signature
+    document.getElementById('clear-signature').addEventListener('click', () => {
+        signaturePad.clear();
+    });
+
+    // Set default dates
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('invoice-date').value = today;
+    document.getElementById('due-date').value = today;
+    document.getElementById('signature-date').value = new Date().toISOString().slice(0, 16);
+
+    // Attach event listeners to the default item row on page load
+    const defaultItemRow = itemsContainer.querySelector('.item-row');
+    if (defaultItemRow) {
+        const inputs = defaultItemRow.querySelectorAll('input, select');
+        inputs.forEach(input => {
+            input.addEventListener('input', () => calculateItemTotal(defaultItemRow));
+        });
+        // Initial calculation in case there are default values
+        calculateItemTotal(defaultItemRow);
+    }
+}); 
+</script>
+    
+</body>
+</html> 
